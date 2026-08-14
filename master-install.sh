@@ -3,3 +3,4 @@
 . ./install-hypr-overrides.sh
 . ./install-stow.sh
 . ./install-dotfiles.sh
+. ./install-herdr.sh
