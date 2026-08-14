@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ORIGINAL_DIR=$(pwd)
+ORIGINAL_DIR=$(pwd);
 REPO_URL="https://github.com/a-yose/dotfiles"
 REPO_DIR="$HOME/dotfiles"
 
@@ -48,7 +48,7 @@ GHOSTTY_CONFIG="$HOME/.config/ghostty/config"
 GHOSTTY_INCLUDE='config-file = ?"~/.config/ghostty/overrides.conf"'
 if [ -f "$GHOSTTY_CONFIG" ] && ! grep -qF "$GHOSTTY_INCLUDE" "$GHOSTTY_CONFIG"; then
   printf '\n# Personal overrides (dotfiles)\n%s\n' "$GHOSTTY_INCLUDE" >>"$GHOSTTY_CONFIG"
-  echo "added overrides include to $GHOSTTY_CONFIG"
+  echo "added ghostty overrides config include to $GHOSTTY_CONFIG"
 fi
 
 # stow zshrc
