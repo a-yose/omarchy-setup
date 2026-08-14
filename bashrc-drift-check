@@ -24,8 +24,11 @@ if [ -f "$OMARCHY_DEFAULT" ]; then
 fi
 
 [ -L ~/.bashrc ] || { echo "Warning: ~/.bashrc is not a symlink. Stow needs to be run"; error=1; }
-[ -f ~/.config/bash/rc.sh ] || { echo "Warning: ~/.config/bash/rc.sh does not exist."; exit 1; }
+[ -f ~/.config/bash/rc.sh ] || { echo "Warning: ~/.config/bash/rc.sh does not exist."; error=1; }
 grep -q 'source ~/.config/bash/rc.sh' ~/.bashrc || { echo "Warning: .bashrc is missing the sourcing of the rc script"; error=1; }
 
-echo "OK: bash config is valid."
+if [ "$error" -eq 0 ]; then
+  echo "OK: bash config is valid."
+fi
+
 exit "$error"
