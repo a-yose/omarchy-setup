@@ -2,43 +2,29 @@
 
 ORIGINAL_DIR=$(pwd)
 REPO_URL="https://github.com/a-yose/dotfiles"
-REPO_NAME="dotfiles"
+REPO_DIR="$HOME/dotfiles"
 
-is_stow_installed() {
-  pacman -Qi "stow" &> /dev/null
-}
-
-if ! is_stow_installed; then
-  echo "Install stow and run script again"
-  exit 1
-fi
-
-cd ~
+command -v stow >/dev/null || { echo "Install stow and run script again."; exit 1; }
 
 # Check if the repository already exists
-if [ -d "$REPO_NAME" ]; then
-  echo "Repository '$REPO_NAME' already exists. Skipping clone"
+if [ -d "$REPO_DIR" ]; then
+  echo "Repository '$REPO_DIR' already exists. Skipping clone"
 else
-  git clone "$REPO_URL"
+  git clone "$REPO_URL" "$REPO_DIR" || exit 1
 fi
 
-# Check if the clone was successful
-if [ $? -eq 0 ]; then
-  echo "removing old configs"
-  # rm -rf ~/.config/tmux/tmux.conf ~/.config/nvim ~/.config/starship.toml ~/.local/share/nvim/ ~/.cache/nvim/ ~/.config/ghostty/config
-  rm -fr ~/.config/bash .bashrc
+echo "removing old configs"
+rm -fr ~/.config/bash ~/.bashrc ~/.ssh/config ~/.config/nvim ~/.local/share/nvim ~/.cache/nvim
 
-  cd "$REPO_NAME"
-  echo "In $(pwd)"
-  stow bash
-  # stow zshrc
-  # stow ghostty
-  # stow tmux
-  # stow nvim
-  # stow starship
-else
-  echo "Failed to clone the repository."
-  exit 1
-fi
+cd "$REPO_DIR"
+
+stow bash
+stow ssh
+stow nvim
+# stow zshrc
+# stow ghostty
+# stow tmux
+# stow starship
 
 cd "$ORIGINAL_DIR"
+echo "dotfiles successully stowed"
