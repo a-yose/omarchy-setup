@@ -1,0 +1,31 @@
+#!/bin/bash
+
+set -uo pipefail
+
+OMARCHY_DEFAULT=~/.local/share/omarchy/default/bashrc
+error=0
+
+if [ ! -f ~/.bashrc ]; then
+  echo "Error: ~/.bashrc does not exist" >&2
+  exit 1
+fi
+
+if [ -f "$OMARCHY_DEFAULT" ]; then
+  diff -q "$OMARCHY_DEFAULT" ~/.bashrc > /dev/null 2>&1
+  status=$?
+  case $status in
+    0) echo ".bashrc file matches Omarchy default. Stow has not been applied."
+       error=1 ;;
+    1) echo ".bashrc differs from Omarchy default."
+       diff -u "$OMARCHY_DEFAULT" ~/.bashrc ;;
+    *) echo "Error: could not compare files (exit status $status)" >&2
+       error=1 ;;
+  esac
+fi
+
+[ -L ~/.bashrc ] || { echo "Warning: ~/.bashrc is not a symlink. Stow needs to be run"; error=1; }
+[ -f ~/.config/bash/rc.sh ] || { echo "Warning: ~/.config/bash/rc.sh does not exist."; exit 1; }
+grep -q 'source ~/.config/bash/rc.sh' ~/.bashrc || { echo "Warning: .bashrc is missing the sourcing of the rc script"; error=1; }
+
+echo "OK: bash config is valid."
+exit "$error"

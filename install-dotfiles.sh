@@ -26,9 +26,11 @@ fi
 if [ $? -eq 0 ]; then
   echo "removing old configs"
   # rm -rf ~/.config/tmux/tmux.conf ~/.config/nvim ~/.config/starship.toml ~/.local/share/nvim/ ~/.cache/nvim/ ~/.config/ghostty/config
-  #
+  rm -fr ~/.config/bash .bashrc
+
   cd "$REPO_NAME"
   echo "In $(pwd)"
+  stow bash
   # stow zshrc
   # stow ghostty
   # stow tmux
