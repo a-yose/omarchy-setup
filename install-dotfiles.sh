@@ -3,7 +3,10 @@
 REPO_URL="https://github.com/a-yose/dotfiles"
 REPO_DIR="$HOME/dotfiles"
 
-command -v stow >/dev/null || { echo "Install stow and run script again."; exit 1; }
+command -v stow >/dev/null || {
+  echo "Install stow and run script again."
+  exit 1
+}
 
 # Check if the repository already exists
 if [ -d "$REPO_DIR" ]; then
@@ -11,8 +14,8 @@ if [ -d "$REPO_DIR" ]; then
   CLONED_REPO=false
   # --ff-only refuses to merge or rewrite anything, so local commits and
   # uncommitted edits are never overwritten -- the pull just fails instead.
-  git -C "$REPO_DIR" pull --ff-only ||
-    echo "!!! could not update $REPO_DIR, stowing the existing checkout" >&2
+  git -C "$REPO_DIR" pull --ff-only \
+    || echo "!!! could not update $REPO_DIR, stowing the existing checkout" >&2
 else
   git clone "$REPO_URL" "$REPO_DIR" || exit 1
   CLONED_REPO=true
