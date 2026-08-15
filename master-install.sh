@@ -7,6 +7,7 @@ SCRIPTS=(
   # install-hypr-overrides
   install-stow
   install-dotfiles
+  install-ghosty
   install-herdr
   install-prettier
   install-sh-fmt
