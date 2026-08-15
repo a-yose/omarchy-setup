@@ -4,7 +4,7 @@
 cd "$(dirname "$0")" || exit 1
 
 SCRIPTS=(
-  install-hypr-overrides
+  # install-hypr-overrides
   install-stow
   install-dotfiles
   install-herdr

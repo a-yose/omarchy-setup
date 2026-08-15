@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-HYPRLAND_CONFIG="$HOME/.config/hypr/hyprland.conf"
+HYPRLAND_CONFIG="$HOME/.config/hypr/hyprland.lua"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OVERRIDES_CONFIG="$SCRIPT_DIR/hypr-overrides.conf"
 SOURCE_LINE="source = $OVERRIDES_CONFIG"
