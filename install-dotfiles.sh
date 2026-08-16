@@ -1,21 +1,30 @@
 #!/bin/bash
+#
+# Stows the dotfiles repo into $HOME.
+#
+# Safe to re-run: every step either checks before acting, or removes and
+# recreates exactly the paths the repo owns.
 
-REPO_URL="https://github.com/a-yose/dotfiles"
-REPO_DIR="$HOME/dotfiles"
+set -euo pipefail
+
+# SSH, so pushes work without a token. Requires an SSH key already registered
+# with GitHub -- on a brand-new machine, set that up before running this.
+readonly REPO_URL="git@github.com:a-yose/dotfiles.git"
+readonly REPO_DIR="$HOME/dotfiles"
 
 command -v stow >/dev/null || {
-  echo "Install stow and run script again."
+  printf 'Install stow and run script again.\n' >&2
   exit 1
 }
 
 # Check if the repository already exists
-if [ -d "$REPO_DIR" ]; then
-  echo "Repository '$REPO_DIR' already exists. Pulling latest changes"
+if [[ -d $REPO_DIR ]]; then
+  printf "Repository '%s' already exists. Pulling latest changes\n" "$REPO_DIR"
   CLONED_REPO=false
   # --ff-only refuses to merge or rewrite anything, so local commits and
   # uncommitted edits are never overwritten -- the pull just fails instead.
   git -C "$REPO_DIR" pull --ff-only \
-    || echo "!!! could not update $REPO_DIR, stowing the existing checkout" >&2
+    || printf '!!! could not update %s, stowing the existing checkout\n' "$REPO_DIR" >&2
 else
   git clone "$REPO_URL" "$REPO_DIR" || exit 1
   CLONED_REPO=true
@@ -24,22 +33,29 @@ fi
 # ~/.local/share/nvim and ~/.cache/nvim hold downloaded plugins, treesitter
 # parsers and Mason binaries.
 # Only worth wiping when that data belongs to some *other* nvim config
-NVIM_LINK="$(readlink -f ~/.config/nvim)"
-NVIM_TARGET="$(readlink -f "$REPO_DIR/nvim/.config/nvim")"
-if [ "$CLONED_REPO" = true ] || [ "$NVIM_LINK" != "$NVIM_TARGET" ]; then
+NVIM_LINK="$(readlink -f "$HOME/.config/nvim")" || NVIM_LINK=""
+NVIM_TARGET="$(readlink -f "$REPO_DIR/nvim/.config/nvim")" || NVIM_TARGET=""
+if [[ $CLONED_REPO == true || $NVIM_LINK != "$NVIM_TARGET" ]]; then
   NVIM_DATA_STALE=true
 else
   NVIM_DATA_STALE=false
 fi
 
-echo "removing old configs"
-rm -fr ~/.config/bash ~/.bashrc ~/.ssh/config ~/.config/nvim ~/.config/herdr/config.toml
+printf 'removing old configs\n'
+OLD_CONFIGS=(
+  "$HOME/.config/bash"
+  "$HOME/.bashrc"
+  "$HOME/.ssh/config"
+  "$HOME/.config/nvim"
+  "$HOME/.config/herdr/config.toml"
+)
+rm -rf "${OLD_CONFIGS[@]}"
 
-if [ "$NVIM_DATA_STALE" = true ]; then
-  echo "removing nvim plugin/cache data (belongs to a different nvim config)"
-  rm -fr ~/.local/share/nvim ~/.cache/nvim
+if [[ $NVIM_DATA_STALE == true ]]; then
+  printf 'removing nvim plugin/cache data (belongs to a different nvim config)\n'
+  rm -rf "$HOME/.local/share/nvim" "$HOME/.cache/nvim"
 else
-  echo "keeping existing nvim plugin/cache data"
+  printf 'keeping existing nvim plugin/cache data\n'
 fi
 
 cd "$REPO_DIR" || exit 1
@@ -51,31 +67,42 @@ stow_package() {
   shift
 
   if stow "$package" "$@"; then
-    echo "==> stowed $package"
+    printf '==> stowed %s\n' "$package"
   else
-    echo "!!! failed to stow $package" >&2
+    printf '!!! failed to stow %s\n' "$package" >&2
     STOW_FAILED+=("$package")
   fi
 }
 
 stow_package bash
 stow_package ssh --no-folding
+stow_package hypr --no-folding --adopt
 stow_package nvim
 stow_package herdr --no-folding
 stow_package ghostty
+
+# --adopt overwrites the repo's copy with whatever was on this machine, so show
+# what changed. On a fresh install that will be Omarchy's stock templates
+# landing on top of your config -- restore yours with, from "$REPO_DIR":
+#   git checkout -- hypr/     (keeps the symlinks; only the contents revert)
+ADOPTED="$(git -C "$REPO_DIR" status --short -- hypr/)"
+if [[ -n $ADOPTED ]]; then
+  printf '==> stow --adopt pulled these into %s/hypr:\n%s\n' "$REPO_DIR" "$ADOPTED"
+  printf '    review with: git -C %s diff -- hypr/\n' "$REPO_DIR"
+fi
 
 # Omarchy owns ~/.config/ghostty/config and edits it during updates, so we don't
 # stow over it -- we only make sure it pulls in our own overrides file.
 GHOSTTY_CONFIG="$HOME/.config/ghostty/config"
 GHOSTTY_INCLUDE='config-file = ?"~/.config/ghostty/overrides.conf"'
-if [ -f "$GHOSTTY_CONFIG" ] && ! grep -qF "$GHOSTTY_INCLUDE" "$GHOSTTY_CONFIG"; then
+if [[ -f $GHOSTTY_CONFIG ]] && ! grep -qF "$GHOSTTY_INCLUDE" "$GHOSTTY_CONFIG"; then
   printf '\n# Personal overrides (dotfiles)\n%s\n' "$GHOSTTY_INCLUDE" >>"$GHOSTTY_CONFIG"
-  echo "added ghostty overrides config include to $GHOSTTY_CONFIG"
+  printf 'added ghostty overrides config include to %s\n' "$GHOSTTY_CONFIG"
 fi
 
-if [ ${#STOW_FAILED[@]} -gt 0 ]; then
-  echo "!!! these packages failed to stow: ${STOW_FAILED[*]}" >&2
+if ((${#STOW_FAILED[@]})); then
+  printf '!!! these packages failed to stow: %s\n' "${STOW_FAILED[*]}" >&2
   exit 1
 fi
 
-echo "dotfiles successfully stowed"
+printf 'dotfiles successfully stowed\n'
