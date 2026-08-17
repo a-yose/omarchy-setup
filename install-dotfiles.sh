@@ -47,6 +47,7 @@ OLD_CONFIGS=(
   "$HOME/.bashrc"
   "$HOME/.ssh/config"
   "$HOME/.config/nvim"
+  "$HOME/.config/mise/config.toml"
   "$HOME/.config/herdr/config.toml"
 )
 rm -rf "${OLD_CONFIGS[@]}"
@@ -78,6 +79,7 @@ stow_package bash
 stow_package ssh --no-folding
 stow_package hypr --no-folding --adopt
 stow_package nvim
+stow_package mise --no-folding
 stow_package herdr --no-folding
 stow_package ghostty
 
