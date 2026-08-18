@@ -49,6 +49,8 @@ OLD_CONFIGS=(
   "$HOME/.config/nvim"
   "$HOME/.config/mise/config.toml"
   "$HOME/.config/herdr/config.toml"
+  "$HOME/.config/git/config"
+  "$HOME/.config/git/ignore"
 )
 rm -rf "${OLD_CONFIGS[@]}"
 
@@ -77,6 +79,7 @@ stow_package() {
 
 stow_package bash
 stow_package ssh --no-folding
+stow_package git --no-folding
 stow_package hypr --no-folding --adopt
 stow_package nvim
 stow_package mise --no-folding
