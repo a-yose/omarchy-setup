@@ -10,6 +10,7 @@ SCRIPTS=(
   install-herdr
   install-prettier
   install-sh-fmt
+  install-bazecor
 )
 
 FAILED=()
