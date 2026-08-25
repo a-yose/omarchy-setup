@@ -51,6 +51,7 @@ OLD_CONFIGS=(
   "$HOME/.config/herdr/config.toml"
   "$HOME/.config/git/config"
   "$HOME/.config/git/ignore"
+  "$HOME/.claude/settings.json"
 )
 rm -rf "${OLD_CONFIGS[@]}"
 
@@ -85,6 +86,7 @@ stow_package nvim
 stow_package mise --no-folding
 stow_package herdr --no-folding
 stow_package ghostty
+stow_package claude --no-folding
 
 # --adopt overwrites the repo's copy with whatever was on this machine, so show
 # what changed. On a fresh install that will be Omarchy's stock templates
