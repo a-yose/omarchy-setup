@@ -52,6 +52,8 @@ OLD_CONFIGS=(
   "$HOME/.config/git/config"
   "$HOME/.config/git/ignore"
   "$HOME/.claude/settings.json"
+  "$HOME/.local/bin/dygma-watch"
+  "$HOME/.config/systemd/user/dygma-watch.service"
 )
 rm -rf "${OLD_CONFIGS[@]}"
 
@@ -87,6 +89,9 @@ stow_package mise --no-folding
 stow_package herdr --no-folding
 stow_package ghostty
 stow_package claude --no-folding
+# --no-folding: ~/.local/bin and ~/.config/systemd/user hold unrelated files, so
+# only the leaf files should be symlinked, never the whole directory.
+stow_package dygma-watch --no-folding
 
 # --adopt overwrites the repo's copy with whatever was on this machine, so show
 # what changed. On a fresh install that will be Omarchy's stock templates

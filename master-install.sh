@@ -11,6 +11,7 @@ SCRIPTS=(
   install-prettier
   install-sh-fmt
   install-bazecor
+  install-dygma-watch
 )
 
 FAILED=()
