@@ -72,7 +72,7 @@ stow_package() {
   local package="$1"
   shift
 
-  if stow "$package" "$@"; then
+  if stow -R "$package" "$@"; then
     printf '==> stowed %s\n' "$package"
   else
     printf '!!! failed to stow %s\n' "$package" >&2
@@ -85,6 +85,8 @@ stow_package ssh --no-folding
 stow_package git --no-folding
 stow_package hypr --no-folding --adopt
 stow_package nvim
+stow_package prettier
+stow_package markdownlint
 stow_package mise --no-folding
 stow_package herdr --no-folding
 stow_package ghostty
