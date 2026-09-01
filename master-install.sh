@@ -12,6 +12,7 @@ SCRIPTS=(
   install-sh-fmt
   install-bazecor
   install-dygma-watch
+  install-webapps
 )
 
 FAILED=()
